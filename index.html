@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 구글 폰트 -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- 브라우저 파이썬 실행 엔진 (Pyodide) -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
     
     <script>
         tailwind.config = {
@@ -54,7 +56,7 @@
         
         textarea, .font-mono {
             tab-size: 4;
-            font-variant-ligatures: none; /* 부등호(<=, >=)가 수학기호로 합쳐져서 보이는 폰트 리거처 현상 방지 */
+            font-variant-ligatures: none;
         }
     </style>
 </head>
@@ -95,7 +97,6 @@
                 <p class="text-slate-500 text-sm sm:text-base">재귀함수의 동작 원리를 시각적으로 이해하고 직접 코드를 실행해보세요.</p>
             </div>
 
-            <!-- 개념 설명 섹션 -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sm:p-8 mb-8">
                 <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center">
                     <svg class="w-6 h-6 mr-2 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -114,18 +115,14 @@
                 </div>
             </div>
 
-            <!-- 시뮬레이터 섹션 -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-                <!-- 예제 선택 탭 -->
                 <div class="flex border-b border-slate-200 bg-slate-50 overflow-x-auto">
                     <button onclick="selectExample('factorial')" id="exBtn-factorial" class="ex-btn active px-6 py-4 text-sm font-bold text-brand-600 border-b-2 border-brand-600 whitespace-nowrap transition-colors">예제 1: 팩토리얼</button>
                     <button onclick="selectExample('fibonacci')" id="exBtn-fibonacci" class="ex-btn px-6 py-4 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 whitespace-nowrap transition-colors">예제 2: 피보나치 수열</button>
                     <button onclick="selectExample('hanoi')" id="exBtn-hanoi" class="ex-btn px-6 py-4 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 whitespace-nowrap transition-colors">예제 3: 하노이의 탑</button>
                 </div>
 
-                <!-- 시뮬레이터 본문 -->
                 <div class="p-6 sm:p-8 space-y-8" id="simulator-content">
-                    <!-- 1단계: 문제 분석 -->
                     <div>
                         <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center">
                             <span class="bg-brand-100 text-brand-700 w-6 h-6 rounded-full flex items-center justify-center text-sm mr-2">1</span> 
@@ -134,19 +131,17 @@
                         <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 text-slate-700 text-sm sm:text-base" id="sim-analysis"></div>
                     </div>
                     
-                    <!-- 2단계: 의사코드 -->
                     <div>
                         <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center">
                             <span class="bg-brand-100 text-brand-700 w-6 h-6 rounded-full flex items-center justify-center text-sm mr-2">2</span> 
                             [2단계] 알고리즘 작성해 보기 (Pseudocode)
                         </h3>
-                        <textarea id="sim-textarea" class="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 mb-3 text-sm text-slate-800" rows="3" placeholder="기저 조건과 재귀 호출을 생각하며 자신만의 언어로 순서를 적어보세요..."></textarea>
+                        <textarea id="sim-textarea" onkeydown="handleCodeInput(event)" class="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 mb-3 text-sm text-slate-800" rows="3" placeholder="기저 조건과 재귀 호출을 생각하며 자신만의 언어로 순서를 적어보세요..."></textarea>
                         <button onclick="togglePseudo()" class="text-sm bg-slate-800 text-white px-5 py-2.5 rounded hover:bg-slate-700 transition shadow-sm font-medium">정답 및 힌트 확인</button>
                         
                         <div id="sim-pseudo-answer" class="hidden mt-4 p-5 bg-yellow-50 border border-yellow-200 rounded-lg text-slate-800 text-sm sm:text-base leading-relaxed whitespace-pre-line shadow-sm"></div>
                     </div>
 
-                    <!-- 3단계: 프로그래밍 시각화 -->
                     <div>
                         <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center">
                             <span class="bg-brand-100 text-brand-700 w-6 h-6 rounded-full flex items-center justify-center text-sm mr-2">3</span> 
@@ -176,10 +171,9 @@
         <section id="content-test" class="tab-content">
             <div class="mb-8">
                 <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">실전 테스트</h1>
-                <p class="text-slate-500 text-sm sm:text-base">학습한 개념을 바탕으로 직접 코드를 작성하고 채점해보세요. (Colab 스타일)</p>
+                <p class="text-slate-500 text-sm sm:text-base">학습한 개념을 바탕으로 직접 코드를 작성하고 파이썬 엔진을 통해 채점해보세요.</p>
             </div>
 
-            <!-- 서브 탭 (기초/심화) -->
             <div class="flex space-x-4 mb-6 border-b border-slate-200">
                 <button onclick="switchTestTab('basic')" id="testTabBtn-basic" class="test-tab-btn px-4 py-3 text-sm font-bold text-brand-600 border-b-2 border-brand-600 transition-colors">기초 학습 (힌트 제공)</button>
                 <button onclick="switchTestTab('advanced')" id="testTabBtn-advanced" class="test-tab-btn px-4 py-3 text-sm font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition-colors">심화 학습 (힌트 없음)</button>
@@ -196,7 +190,6 @@
             <div class="bg-white rounded-xl shadow-xl w-11/12 max-w-sm overflow-hidden p-6 relative">
                 <div id="password-section" class="hidden">
                     <h3 class="text-lg font-bold text-slate-900 mb-4">비밀번호 입력</h3>
-                    <!-- 힌트 문구 없이 비밀번호라는 Placeholder만 제공 -->
                     <input type="password" id="pwd-input" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none mb-3 font-mono" placeholder="비밀번호" onkeyup="if(event.key==='Enter') checkPassword()">
                     <p id="pwd-error" class="text-red-500 text-xs hidden mb-4">비밀번호가 일치하지 않습니다.</p>
                     <div class="flex justify-end space-x-2">
@@ -236,6 +229,17 @@
     </footer>
 
     <script>
+        // --- 0. 파이썬 실행 엔진 (Pyodide) 초기화 ---
+        let pyodideInstance = null;
+        async function initPyodide() {
+            try {
+                pyodideInstance = await loadPyodide();
+                console.log("Pyodide(파이썬 엔진) 로드 완료!");
+            } catch (err) {
+                console.error("Pyodide 로드 실패:", err);
+            }
+        }
+
         // --- 1. 탭 전환 기능 ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -360,21 +364,21 @@
         }
         function resetCodeStep() { initSimulator(); }
 
-        // --- 3. 실전 테스트 데이터 및 렌더링 ---
+        // --- 3. 실전 테스트 데이터 및 렌더링 (테스트 실행 코드 포함) ---
         const testProblems = {
             basic: [
-                { id: 'b1', title: '1. 1부터 N까지의 합 구하기', desc: '정수 N이 주어질 때, 1부터 N까지의 모든 정수의 합을 구하는 재귀함수를 작성하세요.', hint: '기저 조건: N이 1일 때 1 반환<br>재귀 호출: N + (N-1까지의 합 반환)', defaultCode: 'def sum_to_n(n):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = sum_to_n(5)\nprint(f"1부터 5까지의 합: {result}")', answerCode: 'def sum_to_n(n):\n    if n <= 1:\n        return 1\n    return n + sum_to_n(n - 1)\n\n# 함수 호출 및 출력\nresult = sum_to_n(5)\nprint(f"1부터 5까지의 합: {result}")' },
-                { id: 'b2', title: '2. 문자열 뒤집기', desc: '주어진 문자열을 뒤집어 반환하는 재귀함수를 작성하세요.', hint: '기저 조건: 문자열 길이가 1 이하일 때 그대로 반환<br>재귀 호출: 맨 앞글자를 맨 뒤로 보내기 (나머지 문자열을 뒤집은 결과 + 맨 앞글자)', defaultCode: 'def reverse_string(s):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = reverse_string("hello")\nprint(f"\'hello\' 뒤집기: {result}")', answerCode: 'def reverse_string(s):\n    if len(s) <= 1:\n        return s\n    return reverse_string(s[1:]) + s[0]\n\n# 함수 호출 및 출력\nresult = reverse_string("hello")\nprint(f"\'hello\' 뒤집기: {result}")' },
-                { id: 'b3', title: '3. 배열의 최대값 찾기', desc: '정수 배열에서 재귀 호출을 이용해 최댓값을 찾으세요.', hint: '기저 조건: 배열 길이가 1일 때 첫 원소 반환<br>재귀 호출: 첫 원소와 나머지 원소들 중 최댓값 비교', defaultCode: 'def find_max(arr):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\narr = [3, 1, 4, 1, 5, 9, 2]\nresult = find_max(arr)\nprint(f"배열의 최댓값: {result}")', answerCode: 'def find_max(arr):\n    if len(arr) == 1:\n        return arr[0]\n    max_of_rest = find_max(arr[1:])\n    return arr[0] if arr[0] > max_of_rest else max_of_rest\n\n# 함수 호출 및 출력\narr = [3, 1, 4, 1, 5, 9, 2]\nresult = find_max(arr)\nprint(f"배열의 최댓값: {result}")' },
-                { id: 'b4', title: '4. 거듭제곱 (x^n) 구하기', desc: '실수 x와 양의 정수 n이 주어질 때, x의 n승을 구하세요.', hint: '기저 조건: n이 0일 때 1 반환<br>재귀 호출: x * x의 (n-1)승 반환', defaultCode: 'def power(x, n):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = power(2, 5)\nprint(f"2의 5승: {result}")', answerCode: 'def power(x, n):\n    if n == 0:\n        return 1\n    return x * power(x, n - 1)\n\n# 함수 호출 및 출력\nresult = power(2, 5)\nprint(f"2의 5승: {result}")' },
-                { id: 'b5', title: '5. 유클리드 호제법 (최대공약수)', desc: '두 정수 a, b의 최대공약수(GCD)를 구하세요. (a > b 가정)', hint: '기저 조건: b가 0일 때 a 반환<br>재귀 호출: b와 (a%b)를 넘겨 다시 호출', defaultCode: 'def gcd(a, b):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = gcd(48, 18)\nprint(f"48과 18의 최대공약수: {result}")', answerCode: 'def gcd(a, b):\n    if b == 0:\n        return a\n    return gcd(b, a % b)\n\n# 함수 호출 및 출력\nresult = gcd(48, 18)\nprint(f"48과 18의 최대공약수: {result}")' }
+                { id: 'b1', title: '1. 1부터 N까지의 합 구하기', desc: '정수 N이 주어질 때, 1부터 N까지의 모든 정수의 합을 구하는 재귀함수를 작성하세요.', hint: '기저 조건: N이 1일 때 1 반환<br>재귀 호출: N + (N-1까지의 합 반환)', defaultCode: 'def sum_to_n(n):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = sum_to_n(5)\nprint(f"1부터 5까지의 합: {result}")', answerCode: 'def sum_to_n(n):\n    if n <= 1:\n        return 1\n    return n + sum_to_n(n - 1)\n\n# 함수 호출 및 출력\nresult = sum_to_n(5)\nprint(f"1부터 5까지의 합: {result}")', testCode: 'sum_to_n(5) == 15 and sum_to_n(10) == 55' },
+                { id: 'b2', title: '2. 문자열 뒤집기', desc: '주어진 문자열을 뒤집어 반환하는 재귀함수를 작성하세요.', hint: '기저 조건: 문자열 길이가 1 이하일 때 그대로 반환<br>재귀 호출: 맨 앞글자를 맨 뒤로 보내기 (나머지 문자열을 뒤집은 결과 + 맨 앞글자)', defaultCode: 'def reverse_string(s):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = reverse_string("hello")\nprint(f"\'hello\' 뒤집기: {result}")', answerCode: 'def reverse_string(s):\n    if len(s) <= 1:\n        return s\n    return reverse_string(s[1:]) + s[0]\n\n# 함수 호출 및 출력\nresult = reverse_string("hello")\nprint(f"\'hello\' 뒤집기: {result}")', testCode: 'reverse_string("hello") == "olleh" and reverse_string("python") == "nohtyp"' },
+                { id: 'b3', title: '3. 배열의 최대값 찾기', desc: '정수 배열에서 재귀 호출을 이용해 최댓값을 찾으세요.', hint: '기저 조건: 배열 길이가 1일 때 첫 원소 반환<br>재귀 호출: 첫 원소와 나머지 원소들 중 최댓값 비교', defaultCode: 'def find_max(arr):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\narr = [3, 1, 4, 1, 5, 9, 2]\nresult = find_max(arr)\nprint(f"배열의 최댓값: {result}")', answerCode: 'def find_max(arr):\n    if len(arr) == 1:\n        return arr[0]\n    max_of_rest = find_max(arr[1:])\n    return arr[0] if arr[0] > max_of_rest else max_of_rest\n\n# 함수 호출 및 출력\narr = [3, 1, 4, 1, 5, 9, 2]\nresult = find_max(arr)\nprint(f"배열의 최댓값: {result}")', testCode: 'find_max([3, 1, 4, 1, 5, 9, 2]) == 9 and find_max([10, 20, 5]) == 20' },
+                { id: 'b4', title: '4. 거듭제곱 (x^n) 구하기', desc: '실수 x와 양의 정수 n이 주어질 때, x의 n승을 구하세요.', hint: '기저 조건: n이 0일 때 1 반환<br>재귀 호출: x * x의 (n-1)승 반환', defaultCode: 'def power(x, n):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = power(2, 5)\nprint(f"2의 5승: {result}")', answerCode: 'def power(x, n):\n    if n == 0:\n        return 1\n    return x * power(x, n - 1)\n\n# 함수 호출 및 출력\nresult = power(2, 5)\nprint(f"2의 5승: {result}")', testCode: 'power(2, 5) == 32 and power(3, 3) == 27' },
+                { id: 'b5', title: '5. 유클리드 호제법 (최대공약수)', desc: '두 정수 a, b의 최대공약수(GCD)를 구하세요. (a > b 가정)', hint: '기저 조건: b가 0일 때 a 반환<br>재귀 호출: b와 (a%b)를 넘겨 다시 호출', defaultCode: 'def gcd(a, b):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = gcd(48, 18)\nprint(f"48과 18의 최대공약수: {result}")', answerCode: 'def gcd(a, b):\n    if b == 0:\n        return a\n    return gcd(b, a % b)\n\n# 함수 호출 및 출력\nresult = gcd(48, 18)\nprint(f"48과 18의 최대공약수: {result}")', testCode: 'gcd(48, 18) == 6 and gcd(17, 5) == 1' }
             ],
             advanced: [
-                { id: 'a1', title: '1. 배열의 모든 조합(Combination) 구하기', desc: '배열에서 r개의 원소를 고르는 모든 조합을 구하세요.', hint: null, defaultCode: 'def get_combinations(arr, r):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = get_combinations([1, 2, 3, 4], 2)\nprint(f"조합 결과:\\n{result}")', answerCode: 'def get_combinations(arr, r):\n    if r == 0:\n        return [[]]\n    if len(arr) < r:\n        return []\n    \n    # 첫 번째 원소를 포함하는 경우\n    with_first = [[arr[0]] + c for c in get_combinations(arr[1:], r - 1)]\n    # 첫 번째 원소를 포함하지 않는 경우\n    without_first = get_combinations(arr[1:], r)\n    \n    return with_first + without_first\n\n# 함수 호출 및 출력\nresult = get_combinations([1, 2, 3, 4], 2)\nprint(f"조합 결과:\\n{result}")' },
-                { id: 'a2', title: '2. 미로 찾기 (백트래킹)', desc: '2차원 배열 미로에서 (0,0)부터 도착점까지 도달 가능한지 판별하세요. (1은 벽, 0은 길)', hint: null, defaultCode: 'def solve_maze(maze, x, y):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nmaze = [\n    [0, 1, 0, 0],\n    [0, 0, 0, 1],\n    [1, 1, 0, 0],\n    [0, 0, 1, 0]\n]\nresult = solve_maze(maze, 0, 0)\nprint(f"도달 가능 여부: {result}")', answerCode: 'def solve_maze(maze, x, y):\n    n = len(maze)\n    m = len(maze[0])\n    \n    # 미로 범위를 벗어나거나 벽(1)인 경우\n    if x < 0 or x >= n or y < 0 or y >= m or maze[x][y] == 1:\n        return False\n        \n    # 목적지에 도달한 경우\n    if x == n - 1 and y == m - 1:\n        return True\n        \n    # 방문 표시 (무한 루프 방지)\n    maze[x][y] = 1\n    \n    # 상하좌우 탐색\n    found = (solve_maze(maze, x + 1, y) or \\\n             solve_maze(maze, x - 1, y) or \\\n             solve_maze(maze, x, y + 1) or \\\n             solve_maze(maze, x, y - 1))\n             \n    return found\n\n# 함수 호출 및 출력\nmaze = [\n    [0, 1, 0, 0],\n    [0, 0, 0, 1],\n    [1, 1, 0, 0],\n    [0, 0, 1, 0]\n]\nresult = solve_maze(maze, 0, 0)\nprint(f"도달 가능 여부: {result}")' },
-                { id: 'a3', title: '3. 괄호 짝맞추기 생성', desc: 'n개의 괄호 쌍이 주어졌을 때, 올바른 모든 괄호 조합을 문자열 리스트로 생성하세요.', hint: null, defaultCode: 'def generate_parentheses(n):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = generate_parentheses(3)\nprint(f"괄호 조합:\\n{result}")', answerCode: 'def generate_parentheses(n):\n    result = []\n    def generate(current, open_count, close_count):\n        if len(current) == n * 2:\n            result.append(current)\n            return\n        if open_count < n:\n            generate(current + "(", open_count + 1, close_count)\n        if close_count < open_count:\n            generate(current + ")", open_count, close_count + 1)\n            \n    generate("", 0, 0)\n    return result\n\n# 함수 호출 및 출력\nresult = generate_parentheses(3)\nprint(f"괄호 조합:\\n{result}")' },
-                { id: 'a4', title: '4. 병합 정렬 (Merge Sort)', desc: '재귀를 이용하여 배열을 오름차순으로 정렬하는 병합 정렬을 구현하세요.', hint: null, defaultCode: 'def merge_sort(arr):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\narr = [38, 27, 43, 3, 9, 82, 10]\nresult = merge_sort(arr)\nprint(f"정렬된 배열: {result}")', answerCode: 'def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n        \n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    \n    merged = []\n    i = j = 0\n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            merged.append(left[i])\n            i += 1\n        else:\n            merged.append(right[j])\n            j += 1\n            \n    merged.extend(left[i:])\n    merged.extend(right[j:])\n    return merged\n\n# 함수 호출 및 출력\narr = [38, 27, 43, 3, 9, 82, 10]\nresult = merge_sort(arr)\nprint(f"정렬된 배열: {result}")' },
-                { id: 'a5', title: '5. 부분집합 (Power Set) 구하기', desc: '집합의 모든 부분집합을 구하는 재귀함수를 작성하세요.', hint: null, defaultCode: 'def power_set(arr):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = power_set([1, 2, 3])\nprint(f"부분집합:\\n{result}")', answerCode: 'def power_set(arr):\n    if not arr:\n        return [[]]\n    \n    # 첫 번째 원소를 제외한 나머지 부분집합 구하기\n    rest = power_set(arr[1:])\n    \n    # 나머지 부분집합에 첫 번째 원소를 더한 집합 구하기\n    with_first = [[arr[0]] + subset for subset in rest]\n    \n    return rest + with_first\n\n# 함수 호출 및 출력\nresult = power_set([1, 2, 3])\nprint(f"부분집합:\\n{result}")' }
+                { id: 'a1', title: '1. 배열의 모든 조합(Combination) 구하기', desc: '배열에서 r개의 원소를 고르는 모든 조합을 구하세요.', hint: null, defaultCode: 'def get_combinations(arr, r):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = get_combinations([1, 2, 3, 4], 2)\nprint(f"조합 결과:\\n{result}")', answerCode: 'def get_combinations(arr, r):\n    if r == 0:\n        return [[]]\n    if len(arr) < r:\n        return []\n    \n    # 첫 번째 원소를 포함하는 경우\n    with_first = [[arr[0]] + c for c in get_combinations(arr[1:], r - 1)]\n    # 첫 번째 원소를 포함하지 않는 경우\n    without_first = get_combinations(arr[1:], r)\n    \n    return with_first + without_first\n\n# 함수 호출 및 출력\nresult = get_combinations([1, 2, 3, 4], 2)\nprint(f"조합 결과:\\n{result}")', testCode: '_res_a1 = get_combinations([1, 2, 3], 2)\n_expected_a1 = [[1, 2], [1, 3], [2, 3]]\nsorted([sorted(x) for x in _res_a1]) == _expected_a1' },
+                { id: 'a2', title: '2. 미로 찾기 (백트래킹)', desc: '2차원 배열 미로에서 (0,0)부터 도착점까지 도달 가능한지 판별하세요. (1은 벽, 0은 길)', hint: null, defaultCode: 'def solve_maze(maze, x, y):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nmaze = [\n    [0, 1, 0, 0],\n    [0, 0, 0, 1],\n    [1, 1, 0, 0],\n    [0, 0, 1, 0]\n]\nresult = solve_maze(maze, 0, 0)\nprint(f"도달 가능 여부: {result}")', answerCode: 'def solve_maze(maze, x, y):\n    n = len(maze)\n    m = len(maze[0])\n    \n    # 미로 범위를 벗어나거나 벽(1)인 경우\n    if x < 0 or x >= n or y < 0 or y >= m or maze[x][y] == 1:\n        return False\n        \n    # 목적지에 도달한 경우\n    if x == n - 1 and y == m - 1:\n        return True\n        \n    # 방문 표시 (무한 루프 방지)\n    maze[x][y] = 1\n    \n    # 상하좌우 탐색\n    found = (solve_maze(maze, x + 1, y) or \\\n             solve_maze(maze, x - 1, y) or \\\n             solve_maze(maze, x, y + 1) or \\\n             solve_maze(maze, x, y - 1))\n             \n    return found\n\n# 함수 호출 및 출력\nmaze = [\n    [0, 1, 0, 0],\n    [0, 0, 0, 1],\n    [1, 1, 0, 0],\n    [0, 0, 1, 0]\n]\nresult = solve_maze(maze, 0, 0)\nprint(f"도달 가능 여부: {result}")', testCode: '_m1 = [[0, 1, 0, 0], [0, 0, 0, 1], [1, 1, 0, 0], [0, 0, 1, 0]]\n_m2 = [[0, 1], [1, 0]]\nsolve_maze(_m1, 0, 0) == True and solve_maze(_m2, 0, 0) == False' },
+                { id: 'a3', title: '3. 괄호 짝맞추기 생성', desc: 'n개의 괄호 쌍이 주어졌을 때, 올바른 모든 괄호 조합을 문자열 리스트로 생성하세요.', hint: null, defaultCode: 'def generate_parentheses(n):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = generate_parentheses(3)\nprint(f"괄호 조합:\\n{result}")', answerCode: 'def generate_parentheses(n):\n    result = []\n    def generate(current, open_count, close_count):\n        if len(current) == n * 2:\n            result.append(current)\n            return\n        if open_count < n:\n            generate(current + "(", open_count + 1, close_count)\n        if close_count < open_count:\n            generate(current + ")", open_count, close_count + 1)\n            \n    generate("", 0, 0)\n    return result\n\n# 함수 호출 및 출력\nresult = generate_parentheses(3)\nprint(f"괄호 조합:\\n{result}")', testCode: 'set(generate_parentheses(3)) == {"((()))", "(()())", "(())()", "()(())", "()()()"}' },
+                { id: 'a4', title: '4. 병합 정렬 (Merge Sort)', desc: '재귀를 이용하여 배열을 오름차순으로 정렬하는 병합 정렬을 구현하세요.', hint: null, defaultCode: 'def merge_sort(arr):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\narr = [38, 27, 43, 3, 9, 82, 10]\nresult = merge_sort(arr)\nprint(f"정렬된 배열: {result}")', answerCode: 'def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n        \n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    \n    merged = []\n    i = j = 0\n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            merged.append(left[i])\n            i += 1\n        else:\n            merged.append(right[j])\n            j += 1\n            \n    merged.extend(left[i:])\n    merged.extend(right[j:])\n    return merged\n\n# 함수 호출 및 출력\narr = [38, 27, 43, 3, 9, 82, 10]\nresult = merge_sort(arr)\nprint(f"정렬된 배열: {result}")', testCode: 'merge_sort([38, 27, 43, 3, 9, 82, 10]) == [3, 9, 10, 27, 38, 43, 82]' },
+                { id: 'a5', title: '5. 부분집합 (Power Set) 구하기', desc: '집합의 모든 부분집합을 구하는 재귀함수를 작성하세요.', hint: null, defaultCode: 'def power_set(arr):\n    # 코드를 작성하세요\n    pass\n\n# 함수 호출 및 출력\nresult = power_set([1, 2, 3])\nprint(f"부분집합:\\n{result}")', answerCode: 'def power_set(arr):\n    if not arr:\n        return [[]]\n    \n    # 첫 번째 원소를 제외한 나머지 부분집합 구하기\n    rest = power_set(arr[1:])\n    \n    # 나머지 부분집합에 첫 번째 원소를 더한 집합 구하기\n    with_first = [[arr[0]] + subset for subset in rest]\n    \n    return rest + with_first\n\n# 함수 호출 및 출력\nresult = power_set([1, 2, 3])\nprint(f"부분집합:\\n{result}")', testCode: '_res_a5 = power_set([1, 2])\nsorted([sorted(x) for x in _res_a5]) == [[], [1], [1, 2], [2]]' }
             ]
         };
 
@@ -403,7 +407,6 @@
                         <div class="text-xs sm:text-sm leading-relaxed">${prob.hint}</div>
                     </div>` : '';
 
-                // Colab 스타일 에디터
                 const cardHTML = `
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition hover:shadow-md">
                         <div class="p-5 sm:p-6">
@@ -414,14 +417,13 @@
                             <div class="mt-5 relative border border-slate-700 rounded-lg overflow-hidden bg-[#1e1e1e]">
                                 <div class="w-full bg-[#2d2d2d] text-slate-400 text-xs px-4 py-2 flex justify-between items-center border-b border-slate-700">
                                     <span class="flex items-center"><svg class="w-4 h-4 mr-1 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M14 3h-4v4h4V3zM14 9h-4v10h4V9zM10 21h4v-2h-4v2zM6 9H2v10h4V9zM6 21H2v-2h4v2zM6 3H2v4h4V3zM22 9h-4v10h4V9zM22 21h-4v-2h4v2zM22 3h-4v4h4V3z"/></svg> solution.py</span>
-                                    <span>Python 3 환경</span>
+                                    <span>Python 3 엔진 연동</span>
                                 </div>
-                                <!-- 코드 입력을 편하게 하도록 탭키 지원 스크립트 연결 -->
-                                <textarea id="code-${prob.id}" onkeydown="handleTab(event)" class="w-full h-64 bg-[#1e1e1e] text-slate-200 font-mono text-sm sm:text-base p-4 focus:outline-none resize-y" spellcheck="false">${prob.defaultCode}</textarea>
+                                <textarea id="code-${prob.id}" onkeydown="handleCodeInput(event)" class="w-full h-64 bg-[#1e1e1e] text-slate-200 font-mono text-sm sm:text-base p-4 focus:outline-none resize-y" spellcheck="false">${prob.defaultCode}</textarea>
                             </div>
                             
                             <div class="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                                <div id="result-${prob.id}" class="text-sm font-medium mb-3 sm:mb-0 hidden w-full sm:w-auto p-3 rounded transition-all"></div>
+                                <div id="result-${prob.id}" class="text-sm font-medium mb-3 sm:mb-0 hidden w-full sm:w-auto p-4 rounded border transition-all"></div>
                                 <div class="flex flex-col sm:flex-row w-full sm:w-auto ml-0 sm:ml-auto space-y-2 sm:space-y-0 sm:space-x-2">
                                     <button onclick="requestAnswer('${prob.id}')" class="w-full sm:w-auto flex-shrink-0 bg-slate-600 text-white px-5 py-2.5 rounded hover:bg-slate-700 transition shadow-sm font-medium flex items-center justify-center">
                                         정답 확인
@@ -438,73 +440,112 @@
             });
         }
 
-        // 탭 키 입력 지원 함수 (들여쓰기)
-        function handleTab(e) {
-            if (e.key == 'Tab') {
+        // --- 4. 탭 키 및 스마트 엔터 (들여쓰기 자동 적용 및 해제) ---
+        function handleCodeInput(e) {
+            const start = e.target.selectionStart;
+            const end = e.target.selectionEnd;
+            const val = e.target.value;
+
+            if (e.key === 'Tab') {
                 e.preventDefault();
-                const start = e.target.selectionStart;
-                const end = e.target.selectionEnd;
-                e.target.value = e.target.value.substring(0, start) + "    " + e.target.value.substring(end);
+                e.target.value = val.substring(0, start) + "    " + val.substring(end);
                 e.target.selectionStart = e.target.selectionEnd = start + 4;
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const currentLineStart = val.lastIndexOf('\n', start - 1) + 1;
+                const currentLine = val.substring(currentLineStart, start);
+                const indentMatch = currentLine.match(/^\s*/);
+                let indent = indentMatch ? indentMatch[0] : "";
+                
+                const trimmedLine = currentLine.trim();
+                
+                // 파이썬처럼 콜론(:)으로 끝나면 들여쓰기 4칸 추가
+                if (trimmedLine.endsWith(':')) {
+                    indent += "    ";
+                } 
+                // return, pass, break, continue 입력 후 블록 빠져나오기 (들여쓰기 4칸 감소)
+                else if (
+                    trimmedLine.startsWith('return ') || trimmedLine === 'return' || 
+                    trimmedLine.startsWith('pass') || 
+                    trimmedLine.startsWith('break') || 
+                    trimmedLine.startsWith('continue')
+                ) {
+                    if (indent.length >= 4) {
+                        indent = indent.substring(0, indent.length - 4);
+                    }
+                }
+                
+                e.target.value = val.substring(0, start) + "\n" + indent + val.substring(end);
+                e.target.selectionStart = e.target.selectionEnd = start + 1 + indent.length;
             }
         }
 
-        // --- 4. 코드 실행 및 스마트 모의 채점(Mock) 로직 ---
-        function runTestCode(id, btnElement) {
+        // --- 5. 파이썬 실제 코드 실행 및 채점 로직 ---
+        async function runTestCode(id, btnElement) {
             const resultDiv = document.getElementById(`result-${id}`);
             const codeInput = document.getElementById(`code-${id}`).value;
             
-            // 버튼 로딩 상태
+            if (!pyodideInstance) {
+                showResult(resultDiv, false, "파이썬 실행 엔진을 로딩 중이거나 인터넷 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
+
+            // 버튼 로딩 상태 변경
             const originalBtnContent = btnElement.innerHTML;
-            btnElement.innerHTML = `<svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 실행 중...`;
+            btnElement.innerHTML = `<svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 채점 중...`;
             btnElement.disabled = true;
             btnElement.classList.add('opacity-75', 'cursor-not-allowed');
             
-            resultDiv.className = 'text-sm font-medium mb-3 sm:mb-0 w-full sm:w-auto p-3 rounded text-slate-600 bg-slate-100';
-            resultDiv.innerText = "테스트 케이스를 검사하고 있습니다...";
+            resultDiv.className = 'text-sm font-medium mb-3 sm:mb-0 w-full sm:w-auto p-4 rounded text-slate-600 bg-slate-100 border border-slate-200';
+            resultDiv.innerHTML = "코드를 실행하여 테스트 케이스를 검사하고 있습니다...";
             resultDiv.style.display = 'block';
 
-            // 1.2초 후 채점 결과 분석
-            setTimeout(() => {
+            // 문제 데이터 가져오기
+            let prob = null;
+            for (const category in testProblems) {
+                const found = testProblems[category].find(p => p.id === id);
+                if (found) prob = found;
+            }
+
+            try {
+                // 매 실행마다 출력 스트림 및 재귀 한도 초기화
+                await pyodideInstance.runPythonAsync(`
+import sys
+import io
+sys.stdout = io.StringIO()
+sys.stderr = io.StringIO()
+sys.setrecursionlimit(2000)
+                `);
+
+                // 사용자가 입력한 코드 실행 (에러 시 catch로 이동)
+                await pyodideInstance.runPythonAsync(codeInput);
+
+                // 정답 판별용 테스트 케이스 실행
+                let isCorrect = await pyodideInstance.runPythonAsync(prob.testCode);
+                
+                // 실행 중 발생한 표준 출력(print 결과 등) 가져오기
+                let stdout = pyodideInstance.runPython("sys.stdout.getvalue()");
+
+                if (isCorrect) {
+                    showResult(resultDiv, true, `✅ <strong>정답입니다! (Success)</strong><br><span class='text-xs font-normal text-green-700 mt-2 block whitespace-pre-wrap'>[출력 결과]\n${stdout || '출력 없음'}</span>`);
+                } else {
+                    showResult(resultDiv, false, `❌ <strong>틀렸습니다. (Fail)</strong><br><span class='text-xs text-red-600 mt-2 block'>- 실행 결과가 올바르지 않거나 모든 테스트 케이스를 통과하지 못했습니다.</span><br><span class='text-xs text-slate-600 mt-1 block whitespace-pre-wrap'>[출력 결과]\n${stdout || '출력 없음'}</span>`);
+                }
+
+            } catch (err) {
+                // 문법 에러, NameError, 혹은 RecursionError 발생 시
+                let errMsg = err.message || err.toString();
+                // 너무 긴 에러 로그 축소
+                if (errMsg.includes('File "<exec>"')) {
+                    const lines = errMsg.split('\n');
+                    errMsg = lines.slice(-4).join('\n');
+                }
+                showResult(resultDiv, false, `❌ <strong>실행 에러 발생</strong><br><div class='text-xs text-red-600 mt-2 bg-red-50 p-2 rounded overflow-x-auto whitespace-pre-wrap'>${errMsg}</div>`);
+            } finally {
                 btnElement.innerHTML = originalBtnContent;
                 btnElement.disabled = false;
                 btnElement.classList.remove('opacity-75', 'cursor-not-allowed');
-
-                // 빈 코드 또는 pass만 있는 경우 처리
-                if (codeInput.trim() === '' || codeInput.includes('pass') && codeInput.trim().endsWith('pass')) {
-                    showResult(resultDiv, false, "코드가 작성되지 않았습니다. 알고리즘을 구현해 주세요.");
-                    return;
-                }
-
-                // [스마트 모의 채점 로직]
-                // 1. 함수 이름 추출 (def 함수명)
-                const funcMatch = codeInput.match(/def\s+([a-zA-Z0-9_]+)\s*\(/);
-                if (!funcMatch) {
-                    showResult(resultDiv, false, "문법 오류: 함수 정의(def)를 찾을 수 없습니다.");
-                    return;
-                }
-                const funcName = funcMatch[1];
-
-                // 2. 재귀 호출 확인 (함수명 등장 횟수가 2번 이상이어야 함)
-                // 정규식으로 단어 경계를 사용하여 정확히 일치하는 함수명만 카운트
-                const funcRegex = new RegExp(`\\b${funcName}\\b`, 'g');
-                const funcCount = (codeInput.match(funcRegex) || []).length;
-                
-                // 3. 기저 조건 확인 (if 문 및 return 문 존재 여부)
-                const hasIf = codeInput.includes('if ') || codeInput.includes('elif ');
-                const hasReturn = codeInput.includes('return');
-
-                // 채점 판별: 함수가 자기 자신을 호출(재귀)하고, 기저 조건(if, return)을 갖추었는가?
-                if (funcCount >= 2 && hasIf && hasReturn) {
-                    showResult(resultDiv, true, "✅ <strong>정답입니다! (Success)</strong><br><span class='text-xs font-normal text-green-700 mt-1 block'>- Test Case 1: Pass<br>- Test Case 2: Pass<br>- Test Case 3: Pass</span>");
-                } else {
-                    let errorMsg = "❌ <strong>틀렸습니다. (Fail)</strong><br>";
-                    if (funcCount < 2) errorMsg += "<span class='text-xs text-red-600'>- 함수 내부에서 자기 자신을 호출하는 '재귀 호출' 패턴이 없습니다.</span>";
-                    else if (!hasIf || !hasReturn) errorMsg += "<span class='text-xs text-red-600'>- 무한 루프를 막기 위한 '기저 조건(Base case)'이 명확하지 않습니다. (if문, return문 확인)</span>";
-                    
-                    showResult(resultDiv, false, errorMsg);
-                }
-            }, 1200);
+            }
         }
 
         // 채점 결과 UI 업데이트 헬퍼 함수
@@ -515,7 +556,7 @@
             element.innerHTML = message;
         }
 
-        // --- 5. 정답 모달 및 비밀번호 로직 ---
+        // --- 6. 정답 모달 및 비밀번호 로직 ---
         let currentProbIdForAnswer = null;
 
         function closeModals() {
@@ -528,17 +569,14 @@
 
         function requestAnswer(probId) {
             currentProbIdForAnswer = probId;
-            closeModals(); // 혹시 열려있는 다른 모달 닫기
+            closeModals();
             document.getElementById('modal-sm').classList.remove('hidden');
             document.getElementById('password-section').classList.remove('hidden');
             
-            // 모달이 그려진 후 포커스 주기
-            setTimeout(() => {
-                document.getElementById('pwd-input').focus();
-            }, 100);
+            setTimeout(() => { document.getElementById('pwd-input').focus(); }, 100);
         }
 
-        // 현재 시스템 날짜 기준 9자리 비밀번호 생성 (!YYYYMMDD)
+        // 현재 시스템 날짜 기준 9자리 비밀번호 (!YYYYMMDD)
         function getSystemDateString() {
             const now = new Date();
             const y = now.getFullYear();
@@ -552,19 +590,15 @@
             const correctPwd = getSystemDateString();
 
             if (inputVal === correctPwd) {
-                // 비밀번호 일치 시
                 closeModals();
                 showAnswerCode(currentProbIdForAnswer);
             } else {
-                // 비밀번호 불일치 시 에러 메시지 노출
                 document.getElementById('pwd-error').classList.remove('hidden');
             }
         }
 
         function showAnswerCode(probId) {
             let answerCodeStr = '';
-            
-            // 데이터에서 해당 문제 정답 찾기
             for (const category in testProblems) {
                 const prob = testProblems[category].find(p => p.id === probId);
                 if (prob) {
@@ -572,7 +606,6 @@
                     break;
                 }
             }
-
             if (answerCodeStr) {
                 document.getElementById('modal-lg').classList.remove('hidden');
                 document.getElementById('answer-code-area').value = answerCodeStr;
@@ -581,6 +614,7 @@
 
         // 초기화 실행
         window.addEventListener('DOMContentLoaded', () => {
+            initPyodide(); // 파이썬 엔진 백그라운드 로드
             initSimulator();
             renderTestProblems();
         });
